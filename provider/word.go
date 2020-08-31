@@ -14,7 +14,7 @@ func readWords() map[string]string {
 	}
 	defer conn.Close()
 
-	err = conn.Exec(`create table word (
+	err = conn.Exec(`create table if not exists word (
 		id integer PRIMARY KEY autoincrement,
 		key varchar(255),
 		value varchar (255)
