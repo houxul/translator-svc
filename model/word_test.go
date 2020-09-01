@@ -1,11 +1,11 @@
-package provider
+package model
 
 import (
 	"testing"
 )
 
 func TestReadWords(t *testing.T) {
-	words := readWords()
+	words := ReadWords()
 	t.Log(words)
 }
 
@@ -16,5 +16,5 @@ func TestWriteWords(t *testing.T) {
 		"c": "3",
 	}
 
-	writeWords(words)
+	WriteWords(words)
 }

@@ -3,6 +3,7 @@ package provider
 import (
 	"strings"
 	"sync"
+	"translator/model"
 )
 
 type provider func([]string) ([]string, error)
@@ -10,9 +11,9 @@ type provider func([]string) ([]string, error)
 var Engine = newEngine()
 
 func newEngine() *engine {
-	words := readWords()
+	words := model.ReadWords()
 	return &engine{
-		providers: []provider{baiduTranslate},
+		providers: []provider{baiduTranslate, tencentTranslate},
 		records:   words,
 	}
 }
@@ -82,5 +83,5 @@ func (e *engine) provider() provider {
 }
 
 func (e *engine) Close() {
-	writeWords(e.records)
+	model.WriteWords(e.records)
 }

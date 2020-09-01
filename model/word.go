@@ -1,4 +1,4 @@
-package provider
+package model
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"github.com/bvinc/go-sqlite-lite/sqlite3"
 )
 
-func readWords() map[string]string {
+func ReadWords() map[string]string {
 	conn, err := sqlite3.Open("./translator.db")
 	if err != nil {
 		panic(fmt.Errorf("sqlite3.Open (%w)", err))
@@ -51,7 +51,7 @@ func readWords() map[string]string {
 	return words
 }
 
-func writeWords(words map[string]string) {
+func WriteWords(words map[string]string) {
 	if len(words) == 0 {
 		return
 	}

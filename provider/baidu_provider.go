@@ -50,7 +50,7 @@ func baiduTranslate(srcs []string) ([]string, error) {
 	}
 	bs, err := request(http.MethodGet, url, queryString, nil, nil)
 	if err != nil {
-		return srcs, fmt.Errorf("request err:(%w)", err)
+		return srcs, fmt.Errorf("baidu request err:(%w)", err)
 	}
 
 	var resp BaiduTransResp
@@ -59,7 +59,7 @@ func baiduTranslate(srcs []string) ([]string, error) {
 	}
 
 	if resp.ErrCode != "" {
-		return srcs, fmt.Errorf("request result:(%s:%s)", resp.ErrCode, resp.ErrMsg)
+		return srcs, fmt.Errorf("baidu request result:(%s:%s)", resp.ErrCode, resp.ErrMsg)
 	}
 
 	dsts := make([]string, len(resp.TransResult))
