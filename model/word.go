@@ -14,16 +14,12 @@ func ReadWords() map[string]string {
 	}
 	defer conn.Close()
 
-	err = conn.Exec(`create table if not exists word (
-		id integer PRIMARY KEY autoincrement,
-		key varchar(255),
-		value varchar (255)
-	);`)
+	err = conn.Exec("create table if not exists `word`(`id` integer PRIMARY KEY autoincrement, `key` varchar(255), `value` varchar(255), unique (`key`));")
 	if err != nil {
 		panic(fmt.Errorf("conn.Exec (%w)", err))
 	}
 
-	stmt, err := conn.Prepare(`SELECT key, value FROM word`)
+	stmt, err := conn.Prepare("SELECT `key`, `value` FROM `word`")
 	if err != nil {
 		panic(fmt.Errorf("conn.Prepare (%w)", err))
 	}
@@ -63,7 +59,7 @@ func WriteWords(words map[string]string) {
 
 	placeholder := strings.Repeat("(?,?),", len(words))
 	placeholder = placeholder[:len(placeholder)-1]
-	sql := fmt.Sprintf("INSERT INTO word(key, value) VALUES %s", placeholder)
+	sql := fmt.Sprintf("INSERT OR IGNORE INTO `word`(`key`, `value`) VALUES %s", placeholder)
 	args := make([]interface{}, 0, 2*len(words))
 	for k, v := range words {
 		args = append(args, k, v)

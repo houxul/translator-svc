@@ -17,4 +17,7 @@ func TestWriteWords(t *testing.T) {
 	}
 
 	WriteWords(words)
+
+	resp := ReadWords()
+	t.Log(resp)
 }
