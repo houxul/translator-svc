@@ -13,7 +13,7 @@ var Engine = newEngine()
 func newEngine() *engine {
 	words := model.ReadWords()
 	return &engine{
-		providers: []provider{baiduTranslate, tencentTranslate},
+		providers: []provider{lingocloudTranslate, baiduTranslate, tencentTranslate},
 		records:   words,
 	}
 }
