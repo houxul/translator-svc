@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -28,13 +27,12 @@ func lingocloudTranslate(srcs []string) ([]string, error) {
 		"x-authorization": "token " + token,
 	}
 
-	bs, err := json.Marshal(payload)
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return srcs, fmt.Errorf("lingocloud request err:(%w)", err)
 	}
-	bod := bytes.NewReader(bs)
 
-	bs, err = request(http.MethodPost, url, nil, headers, bod)
+	bs, err := request(http.MethodPost, url, nil, headers, body)
 	if err != nil {
 		return srcs, fmt.Errorf("lingocloud request err:(%w)", err)
 	}

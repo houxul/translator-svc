@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -49,8 +48,8 @@ func tencentTranslate(srcs []string) ([]string, error) {
 	queryString["Signature"] = tencentSignature(secretKey, queryString)
 
 	pairs := genPairs(queryString)
-	bod := bytes.NewReader([]byte(strings.Join(pairs, "&")))
-	bs, err := request(http.MethodPost, "https://tmt.tencentcloudapi.com", nil, nil, bod)
+	body := []byte(strings.Join(pairs, "&"))
+	bs, err := request(http.MethodPost, "https://tmt.tencentcloudapi.com", nil, nil, body)
 	if err != nil {
 		return srcs, fmt.Errorf("tencent request err:(%w)", err)
 	}

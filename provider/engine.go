@@ -1,8 +1,10 @@
 package provider
 
 import (
+	"fmt"
 	"strings"
 	"sync"
+	"time"
 	"translator/model"
 )
 
@@ -13,8 +15,20 @@ var Engine = newEngine()
 func newEngine() *engine {
 	words := model.ReadWords()
 	return &engine{
-		providers: []provider{lingocloudTranslate, baiduTranslate, tencentTranslate},
-		records:   words,
+		providers: []provider{timeWrapper("lingocloud", lingocloudTranslate),
+			timeWrapper("baidu", baiduTranslate),
+			timeWrapper("tencent", tencentTranslate)},
+		records: words,
+	}
+}
+
+func timeWrapper(laber string, p provider) provider {
+	return func(srcs []string) ([]string, error) {
+		startTime := time.Now()
+		defer func(laber string) {
+			fmt.Printf("%s %d\n", laber, time.Now().Sub(startTime).Milliseconds())
+		}(laber)
+		return p(srcs)
 	}
 }
 

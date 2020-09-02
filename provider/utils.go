@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
@@ -14,10 +15,27 @@ import (
 	"time"
 )
 
-func request(method, url string, queryString, headers map[string]string, bod io.Reader) ([]byte, error) {
+func request(method, url string, queryString, headers map[string]string, body []byte) (bs []byte, err error) {
+	// startTime := time.Now()
 	// defer func() {
-	// 	// TODO 记录日志
+	// 	var fields = map[string]interface{}{
+	// 		"method":      method,
+	// 		"url":         url,
+	// 		"body":        string(body),
+	// 		"queryString": queryString,
+	// 		"headers":     headers,
+	// 		"resp":        string(bs),
+	// 		"err":         err,
+	// 	}
+
+	// 	cost := time.Now().Sub(startTime).Milliseconds()
+	// 	fmt.Printf("%s %d %v\n", startTime.Format("2006-01-02 15:04:05.999"), cost, fields)
 	// }()
+
+	var bod io.Reader
+	if body != nil {
+		bod = bytes.NewReader(body)
+	}
 
 	req, err := http.NewRequest(method, url, bod)
 	if err != nil {
@@ -40,7 +58,7 @@ func request(method, url string, queryString, headers map[string]string, bod io.
 	}
 	defer resp.Body.Close()
 
-	bs, err := ioutil.ReadAll(resp.Body)
+	bs, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
