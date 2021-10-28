@@ -27,6 +27,11 @@ func main() {
 }
 
 func router(w http.ResponseWriter, req *http.Request) {
+	if req.URL.Path == "/ping" {
+		fmt.Fprintln(w, "ok")
+		return
+	}
+
 	switch req.Method {
 	case http.MethodPost:
 		switch req.URL.Path {
