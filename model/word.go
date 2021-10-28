@@ -2,13 +2,30 @@ package model
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/bvinc/go-sqlite-lite/sqlite3"
 )
 
+var dbPath string
+
+func getDbPath() string {
+	if dbPath != "" {
+		return dbPath
+	}
+
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	dbPath = filepath.Dir(ex) + "/translator.db"
+	return dbPath
+}
+
 func ReadWords() map[string]string {
-	conn, err := sqlite3.Open("./translator.db")
+	conn, err := sqlite3.Open(getDbPath())
 	if err != nil {
 		panic(fmt.Errorf("sqlite3.Open (%w)", err))
 	}
@@ -51,7 +68,7 @@ func WriteWords(words map[string]string) {
 	if len(words) == 0 {
 		return
 	}
-	conn, err := sqlite3.Open("./translator.db")
+	conn, err := sqlite3.Open(getDbPath())
 	if err != nil {
 		panic(fmt.Errorf("sqlite3.Open (%w)", err))
 	}
