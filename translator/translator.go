@@ -31,16 +31,3 @@ func Translate(w http.ResponseWriter, req *http.Request) {
 	bs, err = json.Marshal(result)
 	fmt.Fprintf(w, "%s", bs)
 }
-
-// func JSON(w http.ResponseWriter, v interface{}) {
-// 	buf := &bytes.Buffer{}
-// 	enc := json.NewEncoder(buf)
-// 	enc.SetEscapeHTML(true)
-// 	if err := enc.Encode(v); err != nil {
-// 		http.Error(w, err.Error(), http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-// 	w.Write(buf.Bytes())
-// }

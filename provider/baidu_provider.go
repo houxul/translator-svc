@@ -28,13 +28,18 @@ type BaiduCommonResp struct {
 	} `json:"trans_result"`
 }
 
-func baiduTranslate(srcs []string) ([]string, error) {
+func baiduTranslate(srcs []string, en2zh bool) ([]string, error) {
 	const (
 		appid = "20200828000553619"
 		key   = "6_VDtMyd41S_qX72AuON"
-		from  = "en"
-		to    = "zh"
 	)
+	var (
+		from = "en"
+		to   = "zh"
+	)
+	if !en2zh {
+		from, to = to, from
+	}
 
 	salt := fmt.Sprintf("%d", time.Now().Unix())
 	query := strings.Join(srcs, "\n")

@@ -8,7 +8,7 @@ import (
 	"translator/model"
 )
 
-type provider func([]string) ([]string, error)
+type provider func([]string, bool) ([]string, error)
 
 var Engine = newEngine()
 
@@ -23,12 +23,12 @@ func newEngine() *engine {
 }
 
 func timeWrapper(laber string, p provider) provider {
-	return func(srcs []string) ([]string, error) {
+	return func(srcs []string, en2zh bool) ([]string, error) {
 		startTime := time.Now()
 		defer func(laber string) {
 			fmt.Printf("%s %d\n", laber, time.Now().Sub(startTime).Milliseconds())
 		}(laber)
-		return p(srcs)
+		return p(srcs, en2zh)
 	}
 }
 
@@ -40,6 +40,17 @@ type engine struct {
 }
 
 func (e *engine) Inquiry(srcs []string) ([]string, error) {
+	if len(srcs) == 0 {
+		return []string{}, nil
+	}
+
+	if isEnWord(srcs[0]) {
+		return e.inquiryEn(srcs)
+	}
+	return e.inquiryZh(srcs)
+}
+
+func (e *engine) inquiryEn(srcs []string) ([]string, error) {
 	dsts := make([]string, len(srcs))
 	missingSrcs := make([]string, 0, len(srcs))
 	missingSrcIndex := make(map[string]int, len(srcs))
@@ -59,7 +70,7 @@ func (e *engine) Inquiry(srcs []string) ([]string, error) {
 	}
 
 	provider := e.provider()
-	missingDsts, err := provider(missingSrcs)
+	missingDsts, err := provider(missingSrcs, true)
 	if err != nil {
 		return dsts, err
 	}
@@ -69,6 +80,11 @@ func (e *engine) Inquiry(srcs []string) ([]string, error) {
 		dsts[missingSrcIndex[src]] = missingDsts[i]
 	}
 	return dsts, nil
+}
+
+func (e *engine) inquiryZh(srcs []string) ([]string, error) {
+	provider := e.provider()
+	return provider(srcs, false)
 }
 
 func (e *engine) record(src string) (string, bool) {
