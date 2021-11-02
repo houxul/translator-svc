@@ -94,3 +94,12 @@ func randString(n int) string {
 	}
 	return string(b)
 }
+
+func isEnWord(src string) bool {
+	for i := 0; i < len(src); i++ {
+		if !(src[i] >= 'a' && src[i] <= 'z') && !(src[i] >= 'A' && src[i] <= 'Z') {
+			return false
+		}
+	}
+	return true
+}

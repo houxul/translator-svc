@@ -28,7 +28,7 @@ type TencentCommonResp struct {
 	TargetText string `json:"TargetText"`
 }
 
-func tencentTranslate(srcs []string) ([]string, error) {
+func tencentTranslate(srcs []string, en2zh bool) ([]string, error) {
 	secretId := "AKIDKOFpDLcqITSfePIrhMlv5zfIfohKk8JD"
 	secretKey := "yg9LJ4kBkFUUDk3T9e4E9n7BCh0DBwQe"
 	queryString := map[string]string{
@@ -44,6 +44,10 @@ func tencentTranslate(srcs []string) ([]string, error) {
 		"Source":     "en",
 		"Target":     "zh",
 		"ProjectId":  "0",
+	}
+	if !en2zh {
+		queryString["Source"] = "zh"
+		queryString["Target"] = "en"
 	}
 	queryString["Signature"] = tencentSignature(secretKey, queryString)
 

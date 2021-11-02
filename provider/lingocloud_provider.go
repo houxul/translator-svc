@@ -12,7 +12,7 @@ type LingocloudTransResp struct {
 	Rc         int      `json:"rc"`
 }
 
-func lingocloudTranslate(srcs []string) ([]string, error) {
+func lingocloudTranslate(srcs []string, en2zh bool) ([]string, error) {
 	token := "tg6jeai9s80m12anug0x"
 	url := "http://api.interpreter.caiyunai.com/v1/translator"
 	payload := map[string]interface{}{
@@ -20,6 +20,9 @@ func lingocloudTranslate(srcs []string) ([]string, error) {
 		"trans_type": "en2zh",
 		"request_id": "demo",
 		"detect":     true,
+	}
+	if !en2zh {
+		payload["trans_type"] = "zh2en"
 	}
 
 	headers := map[string]string{
