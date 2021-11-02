@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 )
 
 func request(method, url string, queryString, headers map[string]string, body []byte) (bs []byte, err error) {
@@ -29,7 +30,7 @@ func request(method, url string, queryString, headers map[string]string, body []
 	// 	}
 
 	// 	cost := time.Now().Sub(startTime).Milliseconds()
-	// 	fmt.Printf("%s %d %v\n", startTime.Format("2006-01-02 15:04:05.999"), cost, fields)
+	// 	log.Printf("%s %d %v\n", startTime.Format("2006-01-02 15:04:05.999"), cost, fields)
 	// }()
 
 	var bod io.Reader
@@ -95,11 +96,11 @@ func randString(n int) string {
 	return string(b)
 }
 
-func isEnWord(src string) bool {
-	for i := 0; i < len(src); i++ {
-		if !(src[i] >= 'a' && src[i] <= 'z') && !(src[i] >= 'A' && src[i] <= 'Z') {
-			return false
+func isZh(str string) bool {
+	for _, v := range str {
+		if unicode.Is(unicode.Han, v) {
+			return true
 		}
 	}
-	return true
+	return false
 }

@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -25,10 +26,13 @@ func newEngine() *engine {
 func timeWrapper(label string, p provider) provider {
 	return func(srcs []string, en2zh bool) ([]string, error) {
 		startTime := time.Now()
+		var result []string
+		var err error
 		defer func(label string) {
-			fmt.Printf("%s cost(%d) en2zh(%t)\n", label, time.Since(startTime).Milliseconds(), en2zh)
+			log.Printf("%s cost(%d) en2zh(%t) srcs(%#v) result(%#v)\n", label, time.Since(startTime).Milliseconds(), en2zh, srcs, result)
 		}(label)
-		return p(srcs, en2zh)
+		result, err = p(srcs, en2zh)
+		return result, err
 	}
 }
 
@@ -44,10 +48,10 @@ func (e *engine) Inquiry(srcs []string) ([]string, error) {
 		return []string{}, nil
 	}
 
-	if len(srcs) == 1 && isEnWord(srcs[0]) {
-		return e.inquiryEn(srcs)
+	if len(srcs) == 1 && isZh(srcs[0]) {
+		return e.inquiryZh(srcs)
 	}
-	return e.inquiryZh(srcs)
+	return e.inquiryEn(srcs)
 }
 
 func (e *engine) inquiryEn(srcs []string) ([]string, error) {

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -75,9 +76,9 @@ func (g *grace) Run(f func() error) {
 
 	select {
 	case sig := <-signals:
-		fmt.Printf("receive signal(%s)\n", sig.String())
+		log.Printf("receive signal(%s)\n", sig.String())
 	case err := <-quit:
-		fmt.Printf("exit with error(%v)\n", err)
+		log.Printf("exit with error(%v)\n", err)
 	}
 
 	for _, cleanup := range g.cleanups {
