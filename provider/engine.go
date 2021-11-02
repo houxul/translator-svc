@@ -88,7 +88,7 @@ func (e *engine) inquiryZh(srcs []string) ([]string, error) {
 	results := make([]string, 0, len(e.providers))
 	for i, p := range e.providers {
 		wg.Add(1)
-		go func() {
+		go func(i int, p provider, srcs []string) {
 			out, err := p(srcs, false)
 			if err != nil {
 				fmt.Println("inquiryZh error", i, srcs[0], err)
@@ -98,7 +98,7 @@ func (e *engine) inquiryZh(srcs []string) ([]string, error) {
 			results = append(results, out...)
 			mu.Unlock()
 			wg.Done()
-		}()
+		}(i, p, srcs)
 	}
 	wg.Wait()
 
