@@ -8,21 +8,21 @@ import (
 	"time"
 )
 
-type TencentTransResp struct {
+type tencentTransResp struct {
 	Response struct {
-		TencentErrResp
-		TencentCommonResp
+		tencentErrResp
+		tencentCommonResp
 	} `json:"Response"`
 }
 
-type TencentErrResp struct {
+type tencentErrResp struct {
 	Error *struct {
 		Code    string `json:"Code"`
 		Message string `json:"Message"`
 	} `json:"Error"`
 }
 
-type TencentCommonResp struct {
+type tencentCommonResp struct {
 	Source     string `json:"Source"`
 	Target     string `json:"Target"`
 	TargetText string `json:"TargetText"`
@@ -58,7 +58,7 @@ func tencentTranslate(srcs []string, en2zh bool) ([]string, error) {
 		return srcs, fmt.Errorf("tencent request err:(%w)", err)
 	}
 
-	var resp TencentTransResp
+	var resp tencentTransResp
 	if err := json.Unmarshal(bs, &resp); err != nil {
 		return srcs, fmt.Errorf("json Unmarshal err:(%w)", err)
 	}

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type LingocloudTransResp struct {
+type lingocloudTransResp struct {
 	Confidence float32  `json:"confidence"`
 	Target     []string `json:"target"`
 	Rc         int      `json:"rc"`
@@ -40,7 +40,7 @@ func lingocloudTranslate(srcs []string, en2zh bool) ([]string, error) {
 		return srcs, fmt.Errorf("lingocloud request err:(%w)", err)
 	}
 
-	var resp LingocloudTransResp
+	var resp lingocloudTransResp
 	if err := json.Unmarshal(bs, &resp); err != nil {
 		return srcs, fmt.Errorf("json Unmarshal err:(%w)", err)
 	}

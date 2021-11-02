@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-type BaiduTransResp struct {
-	BaiduErrResp
-	BaiduCommonResp
+type baiduTransResp struct {
+	baiduErrResp
+	baiduCommonResp
 }
 
-type BaiduErrResp struct {
+type baiduErrResp struct {
 	ErrCode string `json:"error_code"`
 	ErrMsg  string `json:"error_msg"`
 }
 
-type BaiduCommonResp struct {
+type baiduCommonResp struct {
 	From        string `json:"from"`
 	To          string `json:"to"`
 	TransResult []struct {
@@ -58,7 +58,7 @@ func baiduTranslate(srcs []string, en2zh bool) ([]string, error) {
 		return srcs, fmt.Errorf("baidu request err:(%w)", err)
 	}
 
-	var resp BaiduTransResp
+	var resp baiduTransResp
 	if err := json.Unmarshal(bs, &resp); err != nil {
 		return srcs, fmt.Errorf("json Unmarshal err:(%w)", err)
 	}
