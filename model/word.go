@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,6 +22,7 @@ func getDbPath() string {
 		panic(err)
 	}
 	dbPath = filepath.Dir(ex) + "/translator.db"
+	log.Println("db path", dbPath)
 	return dbPath
 }
 
