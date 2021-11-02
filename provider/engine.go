@@ -22,12 +22,12 @@ func newEngine() *engine {
 	}
 }
 
-func timeWrapper(laber string, p provider) provider {
+func timeWrapper(label string, p provider) provider {
 	return func(srcs []string, en2zh bool) ([]string, error) {
 		startTime := time.Now()
-		defer func(laber string) {
-			fmt.Printf("%s %d\n", laber, time.Now().Sub(startTime).Milliseconds())
-		}(laber)
+		defer func(label string) {
+			fmt.Printf("%s cost(%d) en2zh(%t)\n", label, time.Since(startTime).Milliseconds(), en2zh)
+		}(label)
 		return p(srcs, en2zh)
 	}
 }
