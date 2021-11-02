@@ -44,7 +44,7 @@ func (e *engine) Inquiry(srcs []string) ([]string, error) {
 		return []string{}, nil
 	}
 
-	if isEnWord(srcs[0]) {
+	if len(srcs) == 1 && isEnWord(srcs[0]) {
 		return e.inquiryEn(srcs)
 	}
 	return e.inquiryZh(srcs)
@@ -83,8 +83,26 @@ func (e *engine) inquiryEn(srcs []string) ([]string, error) {
 }
 
 func (e *engine) inquiryZh(srcs []string) ([]string, error) {
-	provider := e.provider()
-	return provider(srcs, false)
+	wg := &sync.WaitGroup{}
+	mu := &sync.Mutex{}
+	results := make([]string, 0, len(e.providers))
+	for i, p := range e.providers {
+		wg.Add(1)
+		go func() {
+			out, err := p(srcs, false)
+			if err != nil {
+				fmt.Println("inquiryZh error", i, srcs[0], err)
+				return
+			}
+			mu.Lock()
+			results = append(results, out...)
+			mu.Unlock()
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+
+	return results, nil
 }
 
 func (e *engine) record(src string) (string, bool) {
