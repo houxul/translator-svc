@@ -19,7 +19,7 @@ func main() {
 
 	s := &http.Server{
 		Addr:    ":8090",
-		Handler: http.HandlerFunc(router),
+		Handler: router(),
 	}
 	grace.Register(func() {
 		s.Shutdown(context.Background())
@@ -27,24 +27,24 @@ func main() {
 	grace.Run(s.ListenAndServe)
 }
 
-func router(w http.ResponseWriter, req *http.Request) {
-	if req.URL.Path == "/ping" {
-		fmt.Fprintln(w, "ok")
-		return
-	}
+func router() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/ping", pingHandler)
+	mux.HandleFunc("/translator", translatorHandler)
+	mux.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("./resources"))))
+	return mux
+}
 
+func pingHandler(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintln(w, "ok")
+}
+
+func translatorHandler(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case http.MethodPost:
-		switch req.URL.Path {
-		case "/translator":
-			translator.Translate(w, req)
-		default:
-			fmt.Fprintf(w, "%s Path not found", req.URL.Path)
-			return
-		}
+		translator.Translate(w, req)
 	default:
 		fmt.Fprintf(w, "%s Method not found", req.Method)
-		return
 	}
 }
 
