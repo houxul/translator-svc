@@ -2,15 +2,16 @@ package model
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/bvinc/go-sqlite-lite/sqlite3"
 )
 
 var dbPath string
+
+const separator = "/:/"
 
 func getDbPath() string {
 	if dbPath != "" {
@@ -27,40 +28,23 @@ func getDbPath() string {
 }
 
 func ReadWords() map[string]string {
-	conn, err := sqlite3.Open(getDbPath())
+	file, err := os.OpenFile(getDbPath(), os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
-		panic(fmt.Errorf("sqlite3.Open (%w)", err))
-	}
-	defer conn.Close()
-
-	err = conn.Exec("create table if not exists `word`(`id` integer PRIMARY KEY autoincrement, `key` varchar(255), `value` varchar(255), unique (`key`));")
-	if err != nil {
-		panic(fmt.Errorf("conn.Exec (%w)", err))
+		panic("os.OpenFile " + err.Error())
 	}
 
-	stmt, err := conn.Prepare("SELECT `key`, `value` FROM `word`")
+	bs, err := io.ReadAll(file)
 	if err != nil {
-		panic(fmt.Errorf("conn.Prepare (%w)", err))
+		panic("io.ReadAll " + err.Error())
 	}
-	defer stmt.Close()
+	if len(bs) == 0 {
+		return map[string]string{}
+	}
 
-	words := make(map[string]string)
-	for {
-		hasRow, err := stmt.Step()
-		if err != nil {
-			panic(fmt.Errorf("stmt.Step (%w)", err))
-		}
-		if !hasRow {
-			break
-		}
-
-		var key string
-		var value string
-		err = stmt.Scan(&key, &value)
-		if err != nil {
-			panic(fmt.Errorf("stmt.Scan (%w)", err))
-		}
-		words[key] = value
+	wordData := strings.Split(string(bs), separator)
+	words := make(map[string]string, len(wordData)/2)
+	for i := 0; i < len(wordData); i += 2 {
+		words[wordData[i]] = wordData[i+1]
 	}
 
 	return words
@@ -70,26 +54,16 @@ func WriteWords(words map[string]string) {
 	if len(words) == 0 {
 		return
 	}
-	conn, err := sqlite3.Open(getDbPath())
-	if err != nil {
-		panic(fmt.Errorf("sqlite3.Open (%w)", err))
-	}
-	defer conn.Close()
 
-	placeholder := strings.Repeat("(?,?),", len(words))
-	placeholder = placeholder[:len(placeholder)-1]
-	sql := fmt.Sprintf("INSERT OR IGNORE INTO `word`(`key`, `value`) VALUES %s", placeholder)
-	args := make([]interface{}, 0, 2*len(words))
-	for k, v := range words {
-		args = append(args, k, v)
+	file, err := os.OpenFile(getDbPath(), os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		panic("os.OpenFile " + err.Error())
 	}
 
-	err = conn.Exec(sql, args...)
-	if err != nil {
-		panic(fmt.Errorf("conn.Prepare (%w)", err))
+	contents := ""
+	for key, value := range words {
+		contents += fmt.Sprintf("%s%s%s%s", key, separator, value, separator)
 	}
-
-	if err != nil {
-		panic(fmt.Errorf("stmt.Exec (%w)", err))
-	}
+	contents = contents[:len(contents)-3]
+	file.WriteString(contents)
 }
