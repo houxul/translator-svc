@@ -104,3 +104,7 @@ func isZh(str string) bool {
 	}
 	return false
 }
+
+func isStatement(str string) bool {
+	return strings.Contains(str, " ")
+}

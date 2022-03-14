@@ -24,9 +24,9 @@ func Translate(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	result, err := provider.Engine.Inquiry(srcs)
+	result, err := provider.Engine.Query(srcs)
 	if err != nil {
-		log.Printf("Engine.Inquiry %v\n", err)
+		log.Printf("Engine.Query %v\n", err)
 		fmt.Fprintf(w, "%v", err)
 		return
 	}
