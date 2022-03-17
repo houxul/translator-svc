@@ -43,18 +43,25 @@ type engine struct {
 	mutex     sync.Mutex
 }
 
-func (e *engine) Inquiry(srcs []string) ([]string, error) {
+func (e *engine) Query(srcs []string) ([]string, error) {
 	if len(srcs) == 0 {
 		return []string{}, nil
 	}
 
-	if len(srcs) == 1 && isZh(srcs[0]) {
-		return e.inquiryZh(srcs)
+	if len(srcs) == 1 {
+		if isZh(srcs[0]) {
+			return e.queryZh(srcs)
+		}
+
+		if isStatement(srcs[0]) {
+			return e.queryStatement(srcs)
+		}
 	}
-	return e.inquiryEn(srcs)
+
+	return e.queryWord(srcs)
 }
 
-func (e *engine) inquiryEn(srcs []string) ([]string, error) {
+func (e *engine) queryWord(srcs []string) ([]string, error) {
 	dsts := make([]string, len(srcs))
 	missingSrcs := make([]string, 0, len(srcs))
 	missingSrcIndex := make(map[string]int, len(srcs))
@@ -86,7 +93,7 @@ func (e *engine) inquiryEn(srcs []string) ([]string, error) {
 	return dsts, nil
 }
 
-func (e *engine) inquiryZh(srcs []string) ([]string, error) {
+func (e *engine) queryZh(srcs []string) ([]string, error) {
 	wg := &sync.WaitGroup{}
 	mu := &sync.Mutex{}
 	results := make([]string, 0, len(e.providers))
@@ -95,7 +102,7 @@ func (e *engine) inquiryZh(srcs []string) ([]string, error) {
 		go func(i int, p provider, srcs []string) {
 			out, err := p(srcs, false)
 			if err != nil {
-				fmt.Println("inquiryZh error", i, srcs[0], err)
+				fmt.Println("queryZh error", i, srcs[0], err)
 				return
 			}
 			mu.Lock()
@@ -107,6 +114,11 @@ func (e *engine) inquiryZh(srcs []string) ([]string, error) {
 	wg.Wait()
 
 	return results, nil
+}
+
+func (e *engine) queryStatement(srcs []string) ([]string, error) {
+	provider := e.provider()
+	return provider(srcs, true)
 }
 
 func (e *engine) record(src string) (string, bool) {
